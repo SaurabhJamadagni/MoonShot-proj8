@@ -25,45 +25,109 @@ struct DisplayMissionNameAndLaunch: View {
     }
 }
 
-struct ContentView: View {
-    let astronauts: [String: Astronaut] = Bundle.main.decode(file: "astronauts.json")
-    let missions: [Mission] = Bundle.main.decode(file: "missions.json")
+struct ListLayout: View {
+    let missions: [Mission]
+    let astronauts: [String: Astronaut]
+    
+    var body: some View {
+        List {
+            ForEach(missions) { mission in
+                NavigationLink {
+                    MissionView(mission: mission, astronauts: astronauts)
+                } label: {
+                    HStack {
+                        Image(mission.imageName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 45, height: 45)
+                            .padding()
+                        
+                        VStack(alignment: .leading) {
+                            Text(mission.displayName)
+                                .font(.headline)
+                            Text(mission.formattedDateString)
+                                .font(.caption)
+                        }
+                    }
+                    
+                }
+                .listRowBackground(Color(red: 0.2, green: 0.2, blue: 0.3))
+                .listRowSeparatorTint(Color(red: 0.1, green: 0.1, blue: 0.2))
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .padding()
+        .listStyle(.plain)
+        .navigationTitle("MoonShot")
+        .background(.darkBackground)
+        .preferredColorScheme(.dark)
+    }
+}
+
+struct GridLayout: View {
+    let missions: [Mission]
+    let astronauts: [String: Astronaut]
     
     let columns = [
         GridItem(.adaptive(minimum: 150))
     ]
     
     var body: some View {
-        NavigationView {
-            ScrollView {
-                LazyVGrid(columns: columns) {
-                    ForEach(missions) { mission in
-                        NavigationLink {
-                            MissionView(mission: mission, astronauts: astronauts)
-                        } label: {
-                            VStack {
-                                Image(mission.imageName)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 100, height: 100)
-                                    .padding()
-                                
-                                DisplayMissionNameAndLaunch(mission: mission)
-                                    
-                            }
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(.lightBackground)
-                            )
+        ScrollView {
+            LazyVGrid(columns: columns) {
+                ForEach(missions) { mission in
+                    NavigationLink {
+                        MissionView(mission: mission, astronauts: astronauts)
+                    } label: {
+                        VStack {
+                            Image(mission.imageName)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 100, height: 100)
+                                .padding()
+
+                            DisplayMissionNameAndLaunch(mission: mission)
+
                         }
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(.lightBackground)
+                        )
                     }
                 }
-                .padding([.horizontal, .bottom])
             }
-            .navigationTitle("MoonShot")
-            .background(.darkBackground)
-            .preferredColorScheme(.dark)
+            .padding([.horizontal, .bottom])
+        }
+        .navigationTitle("MoonShot")
+        .background(.darkBackground)
+        .preferredColorScheme(.dark)
+    }
+}
+
+struct ContentView: View {
+    @State private var gridIsEnabled = true
+    
+    let astronauts: [String: Astronaut] = Bundle.main.decode(file: "astronauts.json")
+    let missions: [Mission] = Bundle.main.decode(file: "missions.json")
+    
+    var body: some View {
+        NavigationView {
+            Group {
+                if gridIsEnabled {
+                    GridLayout(missions: missions, astronauts: astronauts)
+                } else {
+                    ListLayout(missions: missions, astronauts: astronauts)
+                }
+            }
+            .toolbar {
+                Button {
+                    gridIsEnabled.toggle()
+                } label: {
+                    Image(systemName: gridIsEnabled ? "list.bullet" : "square.grid.2x2")
+                        .foregroundColor(.white)
+                }
+            }
         }
     }
 }
