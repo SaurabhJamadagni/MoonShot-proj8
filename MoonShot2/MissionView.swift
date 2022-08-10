@@ -7,12 +7,68 @@
 
 import SwiftUI
 
-struct MissionView: View {
-    struct CrewMember {
-        let role: String
-        let astronaut: Astronaut
-    }
+struct CrewMember {
+    let role: String
+    let astronaut: Astronaut
+}
+
+struct AstronautCarousel: View {
+    let crew: [CrewMember]
     
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack {
+                ForEach(crew, id: \.role) { crewMember in
+                    NavigationLink {
+                        AstronautView(astronaut: crewMember.astronaut)
+                    } label: {
+                        HStack {
+                            ZStack {
+                                Image(crewMember.astronaut.id)
+                                    .resizable()
+                                    .frame(width: 260, height: 180)
+                                    .shadow(radius: 10)
+                                
+                                LinearGradient(stops: [
+                                    .init(color: .clear, location: 0.3),
+                                    .init(color: .black, location: 0.98)
+                                ], startPoint: .top, endPoint: .bottom)
+                                    
+                                
+                                HStack {
+                                    VStack(alignment: .leading) {
+                                        Spacer()
+                                        Text(crewMember.astronaut.name)
+                                            .foregroundColor(.white)
+                                            .font(.headline)
+                                        Text(crewMember.role)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    .padding([.bottom, .horizontal])
+                                    
+                                    Spacer()
+                                }
+                            }
+                            .clipShape(RoundedRectangle(cornerRadius: 20))
+                        }
+                        .padding(.horizontal)
+                    }
+                }
+            }
+        }
+    }
+}
+
+struct CustomDivider: View {
+    var body: some View {
+        Rectangle()
+            .frame(height: 2)
+            .foregroundColor(.lightBackground)
+            .padding(.vertical)
+    }
+}
+
+struct MissionView: View {
     let mission: Mission
     let crew: [CrewMember]
     
@@ -29,10 +85,7 @@ struct MissionView: View {
                     
                     
                     VStack(alignment: .leading) {
-                        Rectangle()
-                            .frame(height: 2)
-                            .foregroundColor(.lightBackground)
-                            .padding(.vertical)
+                        CustomDivider()
                         
                         Text("Mission Highlights")
                             .font(.title.bold())
@@ -43,10 +96,7 @@ struct MissionView: View {
                         
                         Text(mission.description)
                         
-                        Rectangle()
-                            .frame(height: 2)
-                            .foregroundColor(.lightBackground)
-                            .padding(.vertical)
+                        CustomDivider()
                         
                         Text("Crew")
                             .font(.title.bold())
@@ -54,46 +104,7 @@ struct MissionView: View {
                     }
                     .padding(.horizontal)
                     
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack {
-                            ForEach(crew, id: \.role) { crewMember in
-                                NavigationLink {
-                                    AstronautView(astronaut: crewMember.astronaut)
-                                } label: {
-                                    HStack {
-                                        ZStack {
-                                            Image(crewMember.astronaut.id)
-                                                .resizable()
-                                                .frame(width: 260, height: 180)
-                                                .shadow(radius: 10)
-                                            
-                                            LinearGradient(stops: [
-                                                .init(color: .clear, location: 0.3),
-                                                .init(color: .black, location: 0.98)
-                                            ], startPoint: .top, endPoint: .bottom)
-                                                
-                                            
-                                            HStack {
-                                                VStack(alignment: .leading) {
-                                                    Spacer()
-                                                    Text(crewMember.astronaut.name)
-                                                        .foregroundColor(.white)
-                                                        .font(.headline)
-                                                    Text(crewMember.role)
-                                                        .foregroundColor(.secondary)
-                                                }
-                                                .padding([.bottom, .horizontal])
-                                                
-                                                Spacer()
-                                            }
-                                        }
-                                        .clipShape(RoundedRectangle(cornerRadius: 20))
-                                    }
-                                    .padding(.horizontal)
-                                }
-                            }
-                        }
-                    }
+                    AstronautCarousel(crew: crew)
                 }
                 .padding(.bottom)
             }

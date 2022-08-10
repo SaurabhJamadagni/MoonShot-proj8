@@ -7,6 +7,24 @@
 
 import SwiftUI
 
+struct DisplayMissionNameAndLaunch: View {
+    let mission: Mission
+    
+    var body: some View {
+        VStack {
+            Text(mission.displayName)
+                .font(.headline)
+                .foregroundColor(.white)
+            Text(mission.formattedDateString)
+                .font(.caption)
+                .foregroundColor(.white.opacity(0.5))
+        }
+        .padding(.vertical)
+        .frame(maxWidth: .infinity)
+        .background(.lightBackground)
+    }
+}
+
 struct ContentView: View {
     let astronauts: [String: Astronaut] = Bundle.main.decode(file: "astronauts.json")
     let missions: [Mission] = Bundle.main.decode(file: "missions.json")
@@ -30,17 +48,8 @@ struct ContentView: View {
                                     .frame(width: 100, height: 100)
                                     .padding()
                                 
-                                VStack {
-                                    Text(mission.displayName)
-                                        .font(.headline)
-                                        .foregroundColor(.white)
-                                    Text(mission.formattedDateString)
-                                        .font(.caption)
-                                        .foregroundColor(.white.opacity(0.5))
-                                }
-                                .padding(.vertical)
-                                .frame(maxWidth: .infinity)
-                                .background(.lightBackground)
+                                DisplayMissionNameAndLaunch(mission: mission)
+                                    
                             }
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                             .overlay(
